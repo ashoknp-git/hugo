@@ -34,7 +34,7 @@ jobs:
         release_name: ${{ matrix.os }}-${{ matrix.arch }}-${{ github.sha }}
         body: Binary for ${{ matrix.os }}-${{ matrix.arch }} build.
     - name: Upload Release Asset
-      id: upload-release-asset 
+      id: upload
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -43,3 +43,6 @@ jobs:
         asset_path: ${{ steps.binary.outputs.bin_path }}
         asset_name: hugo
         asset_content_type: application/unknown
+    - name: Get Download URL
+      run: echo ${{ steps.upload.browser_download_url }}
+
