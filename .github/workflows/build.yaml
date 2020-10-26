@@ -95,7 +95,7 @@ jobs:
         asset_content_type: application/unknown
     - name: Get Download URL
       run: echo ${{ steps.upload.browser_download_url }}
-    - name: uplaod ot dreamhost
+    - name: Upload to DreamHost
       uses: fastai/workflows/rsync-mac@master
       with: 
         username: jeremyphoward
