@@ -21,6 +21,8 @@ jobs:
     steps:
     - name: Copy Repository Contents
       uses: actions/checkout@master
+      with:
+        fetch-depth: 0 # get all tags
     - name: Build Binary
       id: binary
       run: ./_action_files/build.sh
