@@ -64,7 +64,6 @@ jobs:
         tag_name: ${{ matrix.os }}-${{ matrix.arch }}
         release_name: ${{ matrix.os }}-${{ matrix.arch }}
         body: Binary for ${{ matrix.os }}-${{ matrix.arch }} build for ${{ github.sha }}.
-        commitish: $${{ github.sha }}
         draft: false
         prerelease: false
     - name: Upload Release Asset
