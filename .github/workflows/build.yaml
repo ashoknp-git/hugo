@@ -26,27 +26,34 @@ jobs:
     - name: Build Binary
       id: binary
       run: ./_action_files/build.sh
-    # - name: delete tag
-    #   run: |
-    #     git tag -d "${{ matrix.os }}-${{ matrix.arch }}"
-    #     git push --delete origin "${{ matrix.os }}-${{ matrix.arch }}"
-    # - name: delete existing release
-    #   uses: actions/github-script@v3
-    #   with:
-    #     github-token: ${{secrets.GITHUB_TOKEN}}
-    #     script: |  
-    #       github.repos.getReleaseByTag({
-    #         owner: context.repo.owner,
-    #         repo: context.repo.repo,
-    #         tag: "${{ matrix.os }}-${{ matrix.arch }}"
-    #       }).then( (release) => {
-    #           var rid = release.data.id
-    #           github.repos.deleteRelease({
-    #             owner: context.repo.owner,
-    #             repo: context.repo.repo,
-    #             release_id:`${rid}`
-    #           })
-    #       });
+    - name: delete tag if exists
+      run: |
+        tag_name="${{ matrix.os }}-${{ matrix.arch }}"
+        if [ $(git tag -l "$tag_name") ]; then
+          git tag -d "$tag_name"
+          git push --delete origin "$tag_name"
+        else
+          echo "$tag_name does not exist"
+        fi
+    - name: delete existing release if exists
+      uses: actions/github-script@v3
+      with:
+        github-token: ${{secrets.GITHUB_TOKEN}}
+        script: |  
+          github.repos.getReleaseByTag({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            tag: "${{ matrix.os }}-${{ matrix.arch }}"
+          }).then( (release) => {
+              var rid = release.data.id
+              github.repos.deleteRelease({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                release_id:`${rid}`
+              })
+          }).catch((error) => {
+               console.error(error);
+          });
     - name: Create Release
       id: create_release
       uses: actions/create-release@v1
