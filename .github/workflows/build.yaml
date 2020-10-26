@@ -22,6 +22,7 @@ jobs:
     - name: Copy Repository Contents
       uses: actions/checkout@master
     - name: Build Binary
+      id: binary
       run: ./_action_files/build.sh
     - name: Create Release
       id: create_release
@@ -39,6 +40,6 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
-        asset_path: ${{ steps.create_release.outputs.bin_path }}
+        asset_path: ${{ steps.binary.outputs.bin_path }}
         asset_name: hugo
         asset_content_type: application/unknown
