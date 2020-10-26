@@ -1,6 +1,8 @@
 name: Build Binaries
 on:
   push:
+    branches:
+      - master
   workflow_dispatch: 
 
 jobs:     
@@ -23,14 +25,11 @@ jobs:
         fetch-depth: 0 # get all tags
     - name: Build Binary
       id: binary
-      run: |
-        ./_action_files/build.sh
-        echo "action_dt=$(date +%Y-%m-%d-%s)" >> $GITHUB_ENV
-        echo "release_name=${{ matrix.os }}-${{ matrix.arch }}" >> $GITHUB_ENV
+      run: ./_action_files/build.sh
     # - name: delete tag
     #   run: |
-    #     git tag -d ${{ github.env.release_name }}
-    #     git push --delete origin ${{ github.env.release_name }}
+    #     git tag -d "${{ matrix.os }}-${{ matrix.arch }}"
+    #     git push --delete origin "${{ matrix.os }}-${{ matrix.arch }}"
     # - name: delete existing release
     #   uses: actions/github-script@v3
     #   with:
@@ -39,7 +38,7 @@ jobs:
     #       github.repos.getReleaseByTag({
     #         owner: context.repo.owner,
     #         repo: context.repo.repo,
-    #         tag: "${{ github.env.release_name }}"
+    #         tag: "${{ matrix.os }}-${{ matrix.arch }}"
     #       }).then( (release) => {
     #           var rid = release.data.id
     #           github.repos.deleteRelease({
@@ -54,9 +53,9 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: ${{ github.env.release_name }}
-        release_name: ${{ github.env.release_name }}
-        body: Binary for ${{ github.env.release_name }} build for ${{ github.sha }} on ${{ github.env.action_dt }}.
+        tag_name: ${{ matrix.os }}-${{ matrix.arch }}
+        release_name: ${{ matrix.os }}-${{ matrix.arch }}
+        body: Binary for ${{ matrix.os }}-${{ matrix.arch }} build for ${{ github.sha }}.
     - name: Upload Release Asset
       id: upload
       uses: actions/upload-release-asset@v1
