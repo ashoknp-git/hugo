@@ -26,7 +26,8 @@ jobs:
       run: ./_action_files/build.sh
     - name: delete tags
       run: |
-        # git tag -d  ${{ matrix.os }}-${{ matrix.arch }}
+        git tag -d ${{ matrix.os }}-${{ matrix.arch }}
+        git push --delete origin ${{ matrix.os }}-${{ matrix.arch }}
     - name: Create Release
       id: create_release
       uses: actions/create-release@v1
