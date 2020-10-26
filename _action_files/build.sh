@@ -14,9 +14,14 @@ go install
 
 if [[ "$GOOS" == "darwin" ]]; then
     BIN_PATH=$GOPATH/bin/hugo
+
+elif [[ "$GOOS" == "windows" ]]; then
+    BIN_PATH=$GOPATH/bin/${GOOS}_${GOARCH}/hugo.exe
+
 else
     BIN_PATH=$GOPATH/bin/${GOOS}_${GOARCH}/hugo
 fi
+
 echo "::endgroup::"
 
 echo "::group::compressing binary" 
