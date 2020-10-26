@@ -21,7 +21,7 @@ jobs:
         git commit -m "[Bot] Update from upstream" --allow-empty
         git push -f
   build:
-    depends-on: rebase
+    needs: rebase
     runs-on: macos-latest
     strategy:
       fail-fast: false
