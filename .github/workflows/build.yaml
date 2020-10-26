@@ -25,18 +25,16 @@ jobs:
         fetch-depth: 0 # get all tags
     - name: Build Binary
       id: binary
-      run: ./_action_files/build.sh
-    - name: delete tags
       run: |
-        git tag -d ${{ matrix.os }}-${{ matrix.arch }}
-        git push --delete origin ${{ matrix.os }}-${{ matrix.arch }}
+        ./_action_files/build.sh
+        echo "action_dt=$(date +%Y-%m-%d-%s)" >> $GITHUB_ENV
     - name: Create Release
       id: create_release
       uses: actions/create-release@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: ${{ matrix.os }}-${{ matrix.arch }}
+        tag_name: ${{ github.env.action_dt }}-${{ matrix.os }}-${{ matrix.arch }}
         release_name: ${{ matrix.os }}-${{ matrix.arch }}
         body: Binary for ${{ matrix.os }}-${{ matrix.arch }} build at ${{ github.sha }}.
     - name: Upload Release Asset
@@ -51,4 +49,3 @@ jobs:
         asset_content_type: application/unknown
     - name: Get Download URL
       run: echo ${{ steps.upload.browser_download_url }}
-
