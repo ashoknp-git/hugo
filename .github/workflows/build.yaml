@@ -24,15 +24,18 @@ jobs:
     - name: Build Binary
       id: binary
       run: ./_action_files/build.sh
+    - name: delete tags
+      run: |
+        # git tag -d  ${{ matrix.os }}-${{ matrix.arch }}
     - name: Create Release
       id: create_release
       uses: actions/create-release@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: ${{ matrix.os }}-${{ matrix.arch }}-${{ github.sha }}
-        release_name: ${{ matrix.os }}-${{ matrix.arch }}-${{ github.sha }}
-        body: Binary for ${{ matrix.os }}-${{ matrix.arch }} build.
+        tag_name: ${{ matrix.os }}-${{ matrix.arch }}
+        release_name: ${{ matrix.os }}-${{ matrix.arch }}
+        body: Binary for ${{ matrix.os }}-${{ matrix.arch }} build at ${{ github.sha }}.
     - name: Upload Release Asset
       id: upload
       uses: actions/upload-release-asset@v1
