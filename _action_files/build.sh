@@ -7,6 +7,8 @@ sudo installer -pkg go1.15.3.darwin-amd64.pkg -target /
 go version
 echo "::endgroup::"
 
+export GOPATH=${HOME}/go
+
 echo "::group::building binary" 
 go install
 

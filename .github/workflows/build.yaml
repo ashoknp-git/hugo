@@ -18,12 +18,11 @@ jobs:
     env:
       GOOS: ${{ matrix.os }}
       GOARCH: ${{ matrix.arch }}
-      GOPATH: /go
     steps:
     - name: Copy Repository Contents
       uses: actions/checkout@master
     - name: Build Binary
-      run: ./_action_files/mac.sh
+      run: ./_action_files/build.sh
     - name: Create Release
       id: create_release
       uses: actions/create-release@v1
