@@ -78,5 +78,12 @@ jobs:
         asset_content_type: application/unknown
     - name: Get Download URL
       run: echo ${{ steps.upload.browser_download_url }}
+    - uses: fastai/workflows/build-docs@master
+      with:
+        username: jeremyphoward
+        hostname: ps625762.dreamhostps.com
+        dest_path: files.fast.ai/hugo/${{ matrix.os }}-${{ matrix.arch }}
+        ssh_key: ${{ secrets.DH_KEY }}
+        src_path: ${{ steps.binary.outputs.bin_path }}
 
   
