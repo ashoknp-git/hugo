@@ -23,7 +23,7 @@ jobs:
         fetch-depth: 0 # get all tags
     - name: Build Binary
       id: binary
-      run: ./_action_files/build1.sh
+      run: bash ./_action_files/build1.sh
     - name: Archive production artifacts
       uses: actions/upload-artifact@v2
       with:
