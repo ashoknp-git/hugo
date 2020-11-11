@@ -3,7 +3,14 @@ on:
   workflow_dispatch: 
 
 jobs: 
+  update:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Copy Repository Contents
+      uses: actions/checkout@master  
+    - run: bash ./_action_files/update.sh
   build:
+    needs: [update]
     strategy:
       fail-fast: false
       matrix:
@@ -14,7 +21,6 @@ jobs:
       uses: actions/checkout@master  
       with:
         fetch-depth: 0 # get all tags
-    - run: bash ./_action_files/update.sh
     - name: Build Binary
       id: binary
       run: ./_action_files/build1.sh
