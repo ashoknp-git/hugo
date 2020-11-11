@@ -6,100 +6,23 @@ on:
   workflow_dispatch: 
 
 jobs: 
-  rebase:
-    runs-on: ubuntu-latest
-    steps:
-    - name: Copy Repository Contents
-      uses: actions/checkout@master  
-    - name: update with upstream
-      run: |
-        git config --global user.email "github-actions[bot]@users.noreply.github.com"
-        git config --global user.name "github-actions[bot]"
-
-        git fetch && git rebase --autostash
-        git add -A
-        git commit -m "[Bot] Update from upstream" --allow-empty
-        git push -f
   build:
-    needs: rebase
-    runs-on: macos-latest
-    outputs:
-      url: ${{ steps.upload.browser_download_url }}
     strategy:
       fail-fast: false
       matrix:
-        os: [darwin, linux, windows]
-        arch: [amd64]
-        exclude:
-          - os: windows
-            arch: arm64
-    env:
-      GOOS: ${{ matrix.os }}
-      GOARCH: ${{ matrix.arch }}
+        os: [macos, ubuntu]
+    runs-on: ${{ matrix.os }}-latest
     steps:
     - name: Copy Repository Contents
-      uses: actions/checkout@master
+      uses: actions/checkout@master  
       with:
         fetch-depth: 0 # get all tags
+    - run: ./_action_files/update.sh
     - name: Build Binary
       id: binary
-      run: ./_action_files/build.sh
-    # - name: delete tag if exists
-    #   run: |
-    #     tag_name="${{ matrix.os }}-${{ matrix.arch }}"
-    #     if [ $(git tag -l "$tag_name") ]; then
-    #       git tag -d "$tag_name"
-    #       git push --delete origin "$tag_name"
-    #     else
-    #       echo "$tag_name does not exist"
-    #     fi
-    - name: delete existing release if exists
-      uses: actions/github-script@v3
+      run: ./_action_files/build1.sh
+    - name: Archive production artifacts
+      uses: actions/upload-artifact@v2
       with:
-        github-token: ${{secrets.GITHUB_TOKEN}}
-        script: |  
-          github.repos.getReleaseByTag({
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            tag: "${{ matrix.os }}-${{ matrix.arch }}"
-          }).then( (release) => {
-              var rid = release.data.id
-              github.repos.deleteRelease({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                release_id:`${rid}`
-              })
-          }).catch((error) => {
-               console.error(error);
-          });
-    - name: Create Release
-      id: create_release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        tag_name: ${{ matrix.os }}-${{ matrix.arch }}
-        release_name: ${{ matrix.os }}-${{ matrix.arch }}
-        body: Binary for ${{ matrix.os }}-${{ matrix.arch }} build for ${{ github.sha }}.
-        draft: false
-        prerelease: false
-    - name: Upload Release Asset
-      id: upload
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
-        asset_path: ${{ steps.binary.outputs.bin_path }}
-        asset_name: hugo
-        asset_content_type: application/unknown
-    - name: Get Download URL
-      run: echo ${{ steps.upload.browser_download_url }}
-    - name: Upload to DreamHost
-      uses: fastai/workflows/rsync-mac@master
-      with: 
-        username: jeremyphoward
-        hostname: ps625762.dreamhostps.com
-        dest_path: files.fast.ai/hugo/${{ matrix.os }}-${{ matrix.arch }}/
-        ssh_key: ${{ secrets.DH_KEY }}
-        src_path: ${{ steps.binary.outputs.bin_path }}
+        name: hugo
+        path: hugo
