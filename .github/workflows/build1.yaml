@@ -1,8 +1,5 @@
-name: Build Binaries
+name: Build Binaries 1
 on:
-  push:
-    branches:
-      - master
   workflow_dispatch: 
 
 jobs: 
@@ -17,7 +14,7 @@ jobs:
       uses: actions/checkout@master  
       with:
         fetch-depth: 0 # get all tags
-    - run: ./_action_files/update.sh
+    - run: bash ./_action_files/update.sh
     - name: Build Binary
       id: binary
       run: ./_action_files/build1.sh
